@@ -6,7 +6,7 @@ import express, { Request, Response } from 'express';
 const app = express()
 
 app.get('/', async (req:Request, res:Response) => {
-    if(!process.env.DBUSER){ //! significa a negação da variável
+    if(!process.env.DBUSER){ 
         res.status(500).send('Variável de ambiente DBUSER não está definida');
         return;
     }
