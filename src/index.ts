@@ -1,3 +1,4 @@
+
 import 'dotenv/config'
 import mysql from 'mysql2/promise';
 console.log(process.env.DBUSER)
@@ -5,8 +6,9 @@ console.log(process.env.DBUSER)
 import express, { Request, Response } from 'express';
 const app = express()
 
-app.get('/', async (req:Request, res:Response) => {
-    if(!process.env.DBUSER){ 
+
+app.get('/produtos', async (req: Request, res: Response) => {
+        if(!process.env.DBUSER){ 
         res.status(500).send('Variável de ambiente DBUSER não está definida');
         return;
     }
@@ -26,26 +28,35 @@ app.get('/', async (req:Request, res:Response) => {
         res.status(500).send('Variável de ambiente DBPORT não está definida');
         return;
     }
-    try{
+    try {
         const connection = await mysql.createConnection({
             host: process.env.DBHOST,
             user: process.env.DBUSER,
             password: process.env.DBPASSWORD,
             database: process.env.DBNAME,
             port: Number(process.env.DBPORT)
-        })
-        res.send('Conectado ao banco de dados com sucesso!');
+        });
+
+        const [rows] = await connection.execute(
+            'SELECT id, nome, preco, urlfoto, descricao FROM produtos'
+        );
+
         await connection.end();
-    }
-    catch (error) {
-        res.status(500).send('Erro ao conectar ao banco de dados: ' + error);
+        res.status(200).json(rows);
+    } catch (error) {
+        res.status(500).json({ erro: 'Erro ao buscar produtos', detalhes: error });
     }
 });
+
 app.listen(8000, () => {
     console.log('Server is running on port 8000');
 });
 
 
+//Criar uma rota /get para produtos que retorne a lista de produtos do banco de dados
+// O produto deve ter id, nome, preco urlImagem, descricao
+//Deve-se criar uma tabela no bando de dados aiven
+// e a resposta deve voltar em json
 
 
 
