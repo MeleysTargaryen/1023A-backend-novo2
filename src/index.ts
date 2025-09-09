@@ -53,11 +53,6 @@ app.listen(8000, () => {
 });
 
 
-//Criar uma rota /get para produtos que retorne a lista de produtos do banco de dados
-// O produto deve ter id, nome, preco urlImagem, descricao
-//Deve-se criar uma tabela no bando de dados aiven
-// e a resposta deve voltar em json
-
 
 
 
