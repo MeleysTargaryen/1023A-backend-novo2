@@ -9,8 +9,8 @@ class ProdutoController {
   }
 
   async adicionar(req: Request, res: Response) {
-    const { nome, preco, foto, descricao } = req.body;
-    const produto = { nome, preco, foto, descricao };
+    const { nome, preco, Urlimagem, descricao } = req.body;
+    const produto = { nome, preco, Urlimagem, descricao };
     const resposta = await db.collection("produtos").insertOne(produto);
     res.status(201).json({ ...produto, _id: resposta.insertedId });
   }
