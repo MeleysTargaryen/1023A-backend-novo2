@@ -1,7 +1,7 @@
 
 import 'dotenv/config'
 import express, { Request, Response } from 'express';
-import rotas from './rotas';
+import rotas from './rotas.js';
 
 const app = express()
 app.use(express.json());

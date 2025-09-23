@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { db } from "../database/banco-moongo";
+import { db } from "../database/banco-moongo.js";
 
 class ProdutoController {
   
