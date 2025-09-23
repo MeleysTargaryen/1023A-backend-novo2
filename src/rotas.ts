@@ -1,13 +1,14 @@
 import usuarioController from "./usuarios/usuario.controller";
-import { Router }   from "express";
+import produtoController from "./produtos/produto.controller"; // ADICIONAR ESTA LINHA
+import { Router } from "express";
 
 const rotas = Router();
 
 rotas.post("/usuarios", usuarioController.adicionar);
 rotas.get("/usuarios", usuarioController.listar);
-rotas.get("/produtos", produtoController.listar);
-//Arrumar rota de produtos
 
 
+rotas.post("/produtos", produtoController.adicionar); 
+rotas.get("/produtos", produtoController.listar);   
 
 export default rotas;
