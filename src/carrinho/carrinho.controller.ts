@@ -20,7 +20,7 @@ class CarrinhoController {
      async adicionar(req: Request, res: Response) {
     const { usuarioId, produtoId, quantidade } = req.body;
 
-    const produto = await db.collection("produtos").findOne({ _id: new ObjectId(produtoId) });
+    const produto = await db.collection("produtos").findOne({ _id: new ObjectId(String(produtoId)) });
     if (!produto) return res.status(404).json({ message: "Produto não encontrado" });
 
     const item: ItemCarrinho = {
