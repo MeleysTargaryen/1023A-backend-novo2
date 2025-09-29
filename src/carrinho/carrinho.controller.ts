@@ -31,32 +31,44 @@ class CarrinhoController {
 
   // POST -> Criar carrinho (um por usuário)
   async adicionar(req: Request, res: Response) {
-    const { usuarioId, produtoId, quantidade } = req.body;
+  const { usuarioId, produtoId, quantidade } = req.body;
 
-    const produto = await db.collection("produtos").findOne({ _id: new ObjectId(String(produtoId)) });
-    if (!produto) return res.status(404).json({ message: "Produto não encontrado" });
+  const produto = await db.collection("produtos").findOne({ _id: new ObjectId(String(produtoId)) });
+  if (!produto) return res.status(404).json({ message: "Produto não encontrado" });
 
-    const item: ItemCarrinho = {
-      produtoid: produtoId,
-      nome: produto.nome,
-      quantidade,
-      precoUnitario: produto.preco,
-    };
+  const carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId });
 
-    const carrinho: Carrinho = {
-      usuarioId,
-      itens: [item],
-      total: item.precoUnitario * item.quantidade,
-    };
+  const novoItem: ItemCarrinho = {
+    produtoid: produtoId,
+    nome: produto.nome,
+    quantidade,
+    precoUnitario: produto.preco,
+  };
 
-    const resultado = await db.collection("carrinhos").updateOne(
-      { usuarioId },
-      { $set: carrinho },
-      { upsert: true }
-    );
+  if (carrinho) {
+    const itemExistente = carrinho.itens.find(i => i.produtoid === produtoId);
+    if (itemExistente) {
+      itemExistente.quantidade += quantidade;
+    } else {
+      carrinho.itens.push(novoItem);
+    }
 
-    res.status(201).json({ ...carrinho, _id: resultado.upsertedId });
+ 
+    carrinho.total = carrinho.itens.reduce((acc, i) => acc + i.precoUnitario * i.quantidade, 0);
+
+    await db.collection("carrinhos").updateOne({ usuarioId }, { $set: carrinho });
+    return res.status(200).json(carrinho);
   }
+
+  const novoCarrinho: Carrinho = {
+    usuarioId,
+    itens: [novoItem],
+    total: novoItem.precoUnitario * novoItem.quantidade,
+  };
+
+  await db.collection("carrinhos").insertOne(novoCarrinho);
+  res.status(201).json(novoCarrinho);
+}
 
   // PUT -> Atualizar quantidade de um produto no carrinho
   async atualizarItem(req: Request, res: Response) {
