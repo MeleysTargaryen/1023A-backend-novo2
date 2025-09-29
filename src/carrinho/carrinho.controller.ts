@@ -19,6 +19,9 @@ class CarrinhoController {
   // GET -> Buscar carrinho por usuário
   async getCarrinho(req: Request, res: Response) {
     const { usuarioId } = req.params;
+    if (!usuarioId) {
+      return res.status(400).json({ message: "usuarioId é obrigatório" });
+    }
     const carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId });
 
     if (!carrinho) return res.status(404).json({ message: "Carrinho não encontrado" });
