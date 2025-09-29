@@ -14,10 +14,20 @@ interface Carrinho {
   itens: ItemCarrinho[];
   total: number;
 }
-class CarrinhoController {
 
-    //Para adicionar um item ao carrinho 
-     async adicionar(req: Request, res: Response) {
+class CarrinhoController {
+  // GET -> Buscar carrinho por usuário
+  async getCarrinho(req: Request, res: Response) {
+    const { usuarioId } = req.params;
+    const carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId });
+
+    if (!carrinho) return res.status(404).json({ message: "Carrinho não encontrado" });
+
+    res.json(carrinho);
+  }
+
+  // POST -> Criar carrinho (um por usuário)
+  async adicionar(req: Request, res: Response) {
     const { usuarioId, produtoId, quantidade } = req.body;
 
     const produto = await db.collection("produtos").findOne({ _id: new ObjectId(String(produtoId)) });
@@ -43,6 +53,40 @@ class CarrinhoController {
     );
 
     res.status(201).json({ ...carrinho, _id: resultado.upsertedId });
+  }
+
+  // PUT -> Atualizar quantidade de um produto no carrinho
+  async atualizarItem(req: Request, res: Response) {
+    const { usuarioId, produtoId, quantidade } = req.body;
+
+    const carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId });
+    if (!carrinho) return res.status(404).json({ message: "Carrinho não encontrado" });
+
+    const itemIndex = carrinho.itens.findIndex(i => i.produtoid === produtoId);
+    if (itemIndex === -1 || !carrinho.itens[itemIndex]) return res.status(404).json({ message: "Produto não está no carrinho" });
+
+    carrinho.itens[itemIndex].quantidade = quantidade;
+
+    // recalcular total
+    carrinho.total = carrinho.itens.reduce(
+      (acc, item) => acc + item.precoUnitario * item.quantidade,
+      0
+    );
+
+    await db.collection("carrinhos").updateOne({ usuarioId }, { $set: carrinho });
+    res.json(carrinho);
+  }
+
+  // DELETE -> Excluir carrinho do usuário
+  async deletarCarrinho(req: Request, res: Response) {
+    const { usuarioId } = req.params;
+
+    const resultado = await db.collection("carrinhos").deleteOne({ usuarioId });
+    if (resultado.deletedCount === 0) {
+      return res.status(404).json({ message: "Carrinho não encontrado" });
+    }
+
+    res.json({ message: "Carrinho deletado com sucesso" });
   }
 }
 
