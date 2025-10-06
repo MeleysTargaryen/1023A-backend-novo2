@@ -15,8 +15,7 @@ rotas.get("/produtos", produtoController.listar);
 
 rotas.get("/carrinho/:usuarioId", carrinhoController.getCarrinho); 
 rotas.post("/carrinho", carrinhoController.adicionar);
-rotas.put("/carrinho", carrinhoController.atualizarItem); 
-rotas.delete("/carrinho/:usuarioId", carrinhoController.deletarCarrinho); 
+
 
 export default rotas;
 
