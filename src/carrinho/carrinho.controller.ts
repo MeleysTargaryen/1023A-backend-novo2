@@ -45,13 +45,11 @@ class CarrinhoController {
       return res.status(400).json({ message: "Quantidade inválida" });
     }
 
-    const usuarioObjectId = new (usuarioId);
-
     let carrinho = await db.collection<Carrinho>("carrinhos").findOne({ usuarioId: ObjectId.createFromHexString(usuarioId)}); 
 
     if (!carrinho) {
       const novoCarrinho: Carrinho = {
-        usuarioId: usuarioObjectId,
+        usuarioId: ObjectId.createFromHexString(usuarioId),
         itens: [{ produtoId, nome, preco, quantidade }],
         total: preco * quantidade,
         modificacao: new Date(),
