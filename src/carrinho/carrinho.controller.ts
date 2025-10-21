@@ -23,12 +23,17 @@ interface Produto {
     descricao:string,
     urlfoto:string
 }
+interface RequestAuth extends Request{
+    usuarioId?:string
+}
 
 class CarrinhoController {
     //adicionarItem
-    async adicionarItem(req:Request, res:Response) {
-        const { usuarioId, produtoId, quantidade } = req.body as {usuarioId: string, produtoId: string, quantidade: number};
-        console.log(usuarioId, produtoId, quantidade)
+    async adicionarItem(req:RequestAuth, res:Response) {
+        const { produtoId, quantidade } = req.body as {usuarioId: string, produtoId: string, quantidade: number};
+        const usuarioId = req.usuarioId
+        if(!usuarioId)
+            return res.status(401).json({mensagem:"Token não foi passado para adicionar no carrinho"})
 
         //Buscar o produto no banco de dados
         const produto = await db.collection<Produto>('produtos')
