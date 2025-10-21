@@ -1,9 +1,5 @@
 import jwt from 'jsonwebtoken'
 import {Request, Response, NextFunction} from 'express'
-function Auth(req:Request,res:Response,next:NextFunction){
-    console.log("Passei no middleware")
-    next()
-}
 
 interface RequestAuth extends Request{
     usuarioId?:string
